@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>iVS</title>
+    </head>
+    <body style="background-color:aquamarine;">
+        <div style = 'text-align: center;'>
+            <video id='video' style = "background-color: beige; border-radius: 5%; border-color: black; border-style: solid; border-width: 0.5mm; position: absolute; left: 39%;" width = "320" height = "240" poster="cartoon.png" controls autoplay muted>
+                <source src = "test_video.mp4" type = "video/mp4">
+            </video>
+            <button onclick="toggleVolume()" style="position:absolute; z-index: 1; left: 39.5%">Mute/Unmute</button>
+            <button onclick="stopVideo()" style="position:absolute; z-index: 1; left: 58%;">X</button>
+            <img id='image' src="cartoon.png" width="400" height="250" style='position: static; opacity: 50%; z-index: 0;' onclick="openImg()">
+        </div>
+    </body>
+
+    <script>
+        function openImg() {
+            var image = document.getElementById('image');
+            var source = image.src;
+            alert("You clicked on the ad!");
+        }
+
+        function toggleVolume() {
+            var video = document.getElementById('video');
+            if (video.muted) {
+                video.muted = false;
+            } else {
+                video.muted = true;
+            }
+        }
+
+        function stopVideo() {
+            var video = document.getElementById('video');
+            video.pause();
+            video.src = 'cartoon.png';
+        }
+    </script>
+</html>
