@@ -1,56 +1,55 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-        <title>iVS</title>
-    </head>
-    <body style="background-color:aquamarine; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
-        <!-- <div style = 'text-align: center;'></div> -->
-    <div style="position: absolute; height: 95%; width: 95%;">
-        
-        <video id='video' style = "display: block; position: absolute; margin-left: auto; margin-right: auto; background-color: beige; border-radius: 5%; border-color: black; border-style: solid; border-width: 0.5mm;" poster="./icons/cartoon.png" width="100%" height="100%" autoplay muted>
-            <source src = "test_video.mp4" type = "video/mp4">
-        </video>
-
-        <!-- Toggle Volume Icon -->
-        <button onclick="toggleVolume()" style="display: block; position:absolute; z-index: 1; width: 5%; height: 5%; min-width: 50px; min-height: 40px; margin-top: 6%; margin-left: 6%; background: transparent; border-color: transparent; border-radius: 100%; overflow: hidden; opacity: 80%; -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%);">
-            <img src="./icons/sound.jpeg" width="100%" height="100%">
-        </button>
-        <!------------------------>
-
-        <!-- Close Ad Icon -->
-        <button onclick="closeAd()" style="position:absolute; z-index: 1; margin-top: 6%; margin-left: 94%; height: 5%; width: 5%; min-width: 40px; min-height: 30px; background: white; border-color: transparent; border-radius: 50%; opacity: 80%; -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%);">
-            <img src="./icons/cross.png" width="100%" height="100%">
-        </button>
-        <!------------------->
-
-        <!-- Play/Pause Icon -->
-        <button onclick="startStopVideo()" style="position:absolute; z-index: 1; opacity: 80%; height: 5%; width: 5%; min-width: 40px; min-height: 30px; border-radius: 50%; background: white; border-color: transparent; top: 50%; left: 50%; -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%);">
-            <img src="./icons/playpause.png" width="90%" height="90%">
-        </button>
-        <!--------------------->
-
-        <!-- Skip Ad Icon -->
-        <button type="button" id="myBtn" class="btnDisable" disabled onclick="closeAd()" style = 'position: absolute; z-index: 1; min-width: 70px; min-height: 20px; height: 3%; width: 21%; top: 75%; left: 89.5%; -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%); text-align: center; vertical-align: middle; padding: 0px; '><a style="font-family: Arial, Helvetica, sans-serif; font-size: calc(0.5vw + 8px);">Skip ad in ... </a><a id="myTimer" style="font-family: Arial, Helvetica, sans-serif; font-size: calc(0.5vw + 8px);"></a></button>
-        <!------------------>
-    </div>
-
-    <!-- Transparent Overlay Image -->
-    <img id='image' src="./icons/cartoon.png" width="500" height="300" style='position: static; opacity: 0%; z-index: 0;' onclick="openImg()">
-    <!------------------------------->
-
-    </body>
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <style>
+        body { font-family:sans-serif; }
+        .ivs_outer { display:block; overflow:hidden; }
+        #ivs_video { display:block; height:100%; width:100%; object-fit: cover; }
+        #ivs_image { display:block; position:relative; opacity: 50%; width: 100%; height: 100%; top: -100%; }
+        #ivs_volume_button { display:block; width: 5%; height:5%; position:relative; top:-198%; left: 2%; background: white; border-radius: 5%/17.8%; opacity: 20%; border-color: transparent;}
+        #ivs_volume_button:hover { opacity: 80%; }
+        #ivs_find_out_more_button { display:block; width: 15%; height:5%; position:relative; top:-203%; left: 82%; background: white; border-radius: 5%/17.8%; opacity: 20%; border-color: transparent;}
+        #ivs_find_out_more_button:hover { opacity: 80%; }
+    </style>
     <script>
-        function openImg() {
-            var image = document.getElementById('image');
-            var source = image.src;
-            alert("You clicked on the ad!");
-        }
+        window.onAdClick=function() {};
+        window.onLinearChange=function() {};
+        window.onAdStop=function() {};
+        window.onAdBlurbClicked=function() {};
+        window.onSlideChanged=function() {};
+      </script>
+    <script src="https://player.ivideosmart.com/ivshotspots/js/external/richmedia-ivs_integration.js" async></script>
+    <title>iVS</title>
+</head>
+<body onresize="resize();">
+  <div class="ivs_outer">
+    <video id='ivs_video' autoplay muted>
+        <source src = "test_video.mp4" type = "video/mp4">
+    </video>
+    <!-- Transparent Overlay Image -->
+    <img id='ivs_image' src="./icons/cartoon.png" onclick="openImg()">
+    <!------------------------------->
+    <!-- Toggle Volume Icon -->
+    <button id='ivs_volume_button' onclick="toggleVolume()" >
+        <img src="./icons/sound.jpeg" width="100%" height="100%">
+    </button>
+    <!------------------------>
 
-        function toggleVolume() {
-            var video = document.getElementById('video');
+    <!-- Find out more Icon -->
+    <button id='ivs_find_out_more_button' onclick="findOutMore()" ><a style="font-family: Arial, Helvetica, sans-serif; font-size: calc(0.75vw + 20px);">Click here to find out more.</a></button>
+    <!------------------------>
+  </div>
+  <script>
+    document.onload = resize();
+    function resize() {
+      let width = document.querySelector(".ivs_outer").offsetWidth;
+      document.querySelector(".ivs_outer").style.height = 9 / 16 *  width + "px";
+      document.querySelector("body").style.fontSize = width / 1080 * 16 + "px";
+    }
+
+    function toggleVolume() {
+            var video = document.getElementById('ivs_video');
             if (video.muted) {
                 video.muted = false;
             } else {
@@ -58,48 +57,9 @@
             }
         }
 
-        function startStopVideo() {
-            var video = document.getElementById('video');
+    function openImg() {};
 
-            if (video.paused) {
-                video.play();
-            }
-            else {
-                video.pause();
-            }
-        }
-
-        function closeAd() {
-            var video = document.getElementById('video');
-
-            if ((video.src) !== '') {}
-            else {
-                video.pause();
-                video.src = './icons/cartoon.png';
-            }
-        }
-
-        var sec = 15;
-        var myTimer = document.getElementById('myTimer');
-        var myBtn = document.getElementById('myBtn');
-        window.onload = countDown;
-
-        function countDown() {
-
-            if (sec < 10) {
-                myTimer.innerHTML = "0" + sec;
-            } else {
-                myTimer.innerHTML = sec;
-            }
-            
-            if (sec == 0) {
-                var btn = document.getElementById('myBtn');
-                btn.disabled = false;
-                return;
-            }
-
-            sec -= 1;
-            window.setTimeout(countDown, 1000);
-        }
-    </script>
+    function findOutMore() {};
+  </script>
+</body>
 </html>
