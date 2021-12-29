@@ -6,9 +6,10 @@
         body { font-family:sans-serif; overflow: hidden;}
         #ivs_video_frame { display: block; height:100%; width: 100%; object-fit: cover; position: relative;}
         #ivs_video { display: block; position: relative; height:88%; width: 88%; object-fit: cover; float: right; z-index: -5;}
-        #ivs_image { display:block; position:relative; opacity: 20%; width: 100%; height: 100%; top: -100%;}
-        #ivs_volume_button { display:block; width: 5%; height:5%; position:relative; top:-198%; left: 2%; background: white; border-radius: 5%/17.8%; opacity: 20%; border-color: transparent;}
-        #ivs_volume_button:hover { opacity: 80%; }
+        #ivs_image { display:block; position:relative; opacity: 0%; width: 100%; height: 100%; top: -100%; }
+        #ivs_poster_frame { display: none; height:100%; width: 100%; object-fit: cover; position: relative; z-index: 1; }
+        #ivs_volume_button { display:block; width: 5%; height:5%; position:relative; top:-198%; left: 2%; background: white; border-radius: 5%/17.8%; opacity: 80%; border-color: transparent;}
+        #ivs_volume_button:hover { opacity: 100%; }
         #ivs_find_out_more_button { display:block; width: 20%; height:5%; position:relative; top:-115%; left: 77%; background: white; border-radius: 5%/17.8%; opacity: 50%; border-color: transparent;}
         #ivs_find_out_more_button:hover { opacity: 80%; }
         progress { display: block; position: relative; width: 100%; height: 3%; top:-112%; left: 0%; }
@@ -25,12 +26,22 @@
 </head>
 <body onresize="resize();">
   <div class="ivs_outer">
+    <!-- Video Frame -->
     <div id = 'ivs_video_frame'>
+      <!-- Image Banner -->
       <img src='./icons/skin.png' style="position: absolute; height: 100%; width: 100%; z-index: -4;">
+      <!-- Video -->
       <video id='ivs_video' autoplay muted>
         <source src = "test_video.mp4" type = "video/mp4">
       </video>
+      <!----------->
+      <!------------------>
     </div>
+    <!----------------->
+
+    <!-- Poster Frame -->
+    <img id='ivs_poster_frame' src="./icons/cartoon.png" onclick="openImg()">
+    <!------------------------------->
     
     <!-- Transparent Overlay Image -->
     <img id='ivs_image' src="./icons/cartoon.png" onclick="openImg()">
@@ -55,6 +66,9 @@
       document.querySelector("body").style.fontSize = width / 1080 * 16 + "px";
     } 
 
+    var video = document.getElementById('ivs_video');
+    const progress = document.getElementById("progress");
+
     function toggleVolume() {
       var video = document.getElementById('ivs_video');
       if (video.muted) {
@@ -71,9 +85,13 @@
     function findOutMore() {
       alert("Find out more.");
     };
-
-    var video = document.getElementById('ivs_video');
-    const progress = document.getElementById("progress");
+     
+    video.addEventListener('ended', function() {
+      var ivs_video_frame = document.getElementById('ivs_video_frame');
+      ivs_video_frame.style.display = 'none';
+      var ivs_poster_frame = document.getElementById('ivs_poster_frame');
+      ivs_poster_frame.style.display = 'block';
+    });
 
     function progressLoop() {
       setInterval(function () {
