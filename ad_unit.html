@@ -3,17 +3,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <style>
-        body { font-family:sans-serif; overflow: hidden;}
-        #ivs_video_frame { display: block; height:100%; width: 100%; object-fit: cover; position: relative;}
-        #ivs_video { display: block; position: relative; height:88%; width: 88%; object-fit: cover; float: right; z-index: -5;}
-        #ivs_image { display:block; position:relative; opacity: 0%; width: 100%; height: 100%; top: -100%; }
-        #ivs_poster_frame { display: none; height:100%; width: 100%; object-fit: cover; position: relative; z-index: 1; }
-        #ivs_volume_button { display:block; width: 5%; height:5%; position:relative; top:-198%; left: 2%; background: white; border-radius: 5%/17.8%; opacity: 80%; border-color: transparent;}
-        #ivs_volume_button:hover { opacity: 100%; }
-        #ivs_find_out_more_button { display:block; width: 20%; height:5%; position:relative; top:-115%; left: 77%; background: white; border-radius: 5%/17.8%; opacity: 50%; border-color: transparent;}
-        #ivs_find_out_more_button:hover { opacity: 80%; }
-        progress { display: block; position: relative; width: 100%; height: 3%; top:-112%; left: 0%; }
+        /* Stretch out HTML body to take up maximum 16:9 aspect ratio */
+        body { position:absolute; top:0%; left:0%; width:100%; height:100%; font-family:sans-serif; padding:0px; margin:0px; background-color:black; }
+        
+        /* Hide overflowing body elements */
+        #ivs_outer { overflow:hidden; }
+
+        /* Stretch video frame to the same size as the HTML body */
+        .ivs_video_frame { width:100%; height:100%; }
+
+        /* Minimize video size and float it to the top right hand corner of the video frame */
+        #ivs_video { position: relative; height:88%; width: 88%; float: right; }
+
+        /* Shift video skin up by 100% to overlap with the video frame */
+        .ivs_video_skin { display: block; height:100%; width:100%; position: relative; top:-100%; left:0%;}
+
+        /* Shift video controls up by 200% to overlap with video frame */
+        .ivs_video_controls { height:100%; width:100%; position: relative; top:-200%; left:0%;}
+
+        /* Progress bar styling */
+        progress { display: block; position: relative; width: 100%; height: 1%; top:99%; left: 0%; border:none; border-radius:0px; color:#3090FF; background-color:#EEEEEE; }
+        progress::-webkit-progress-value { background: #3090FF; }
+        progress::-webkit-progress-bar { background: #AAAAAA; }
+        progress::-moz-progress-bar { background: #3090FF; }
+      
+        /* Volume button styling */
+        .ivs_volume_button { display:block; width: 5%; height:5%; position:relative; top:2%; left: 2%; background: white; border-radius: 5%/17.8%; border-color: transparent; cursor: pointer;}
+        /* Increase transparency of icon upon mouse hover */
+        .ivs_volume_button:hover { opacity: 50%; }
+        /* Centre volume icon in the button */
+        #ivs_volume_image { position:absolute; top: 50%; left:50%; -webkit-transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%); } 
+
+        /* Find out more button styling */
+        #ivs_find_out_more_button { display:block; width: 20%; height:6%; position:relative; top:83.5%; left: 77%; background: #ff7b07; border: none; border-radius: 3%/20%; opacity: 100%; cursor: pointer; color: white; font-size:2.2em; }
+        /* Increase transparency of icon upon mouse hover */
+        #ivs_find_out_more_button:hover { opacity: 50%; }
+
+        /* Shift poster frame up by 300% to overlap with video frame and hide poster upon loading */
+        #ivs_poster_frame { display: block; height:100%; width:100%; position: relative; top:-300%; left:0%; visibility:hidden; }
     </style>
+    
+    <!-- Preload script with empty functions -->
     <script>
         window.onAdClick=function() {};
         window.onLinearChange=function() {};
@@ -21,85 +51,113 @@
         window.onAdBlurbClicked=function() {};
         window.onSlideChanged=function() {};
       </script>
-    <script src="https://player.ivideosmart.com/ivshotspots/js/external/richmedia-ivs_integration.js" async></script>
+    <!----------------------------------------->
+    <script src="https://player.ivideosmart.com/ivshotspots/js/external/richmedia-ivs-integration.js" async></script>
     <title>iVS</title>
 </head>
-<body onresize="resize();">
-  <div class="ivs_outer">
+<body onresize="resize()">
+  <div id="ivs_outer" onclick="backgroundClick()">
+
     <!-- Video Frame -->
-    <div id = 'ivs_video_frame'>
-      <!-- Image Banner -->
-      <img src='./icons/skin.png' style="position: absolute; height: 100%; width: 100%; z-index: -4;">
+    <div class='ivs_video_frame'>
       <!-- Video -->
       <video id='ivs_video' autoplay muted>
         <source src = "test_video.mp4" type = "video/mp4">
       </video>
       <!----------->
-      <!------------------>
     </div>
     <!----------------->
 
-    <!-- Poster Frame -->
-    <img id='ivs_poster_frame' src="./icons/final_frame.jpeg" onclick="openImg()">
-    <!------------------------------->
-    
-    <!-- Transparent Overlay Image -->
-    <img id='ivs_image' src="./icons/cartoon.png" onclick="openImg()">
-    <!------------------------------->
-    <!-- Toggle Volume Icon -->
-    <button id='ivs_volume_button' onclick="toggleVolume()" >
-        <img src="./icons/sound.jpeg" width="100%" height="100%">
-    </button>
-    <!------------------------>
+    <!-- Image Banner -->
+    <img class="ivs_video_skin" src='./icons/skin.png' />
+    <!------------------>
 
-    <!-- Find out more Icon -->
-    <button id='ivs_find_out_more_button' onclick="findOutMore()" ><a style="font-family: Arial, Helvetica, sans-serif; font-size: calc(1vw + 5px);">Find out more.</a></button>
-    <!------------------------>
-    <progress id='progress' max="100" value="50"></progress>
+    <!-- Video Controls -->
+    <div class="ivs_video_controls">
+      <!-- Progress Bar -->
+      <progress id='progress' max="100" value="0"></progress>
+      <!------------------>
+      <!-- Toggle Volume Icon -->
+      <button class='ivs_volume_button' onclick="event.stopPropagation();toggleVolume()" >
+          <img src="icons/volume-mute.svg" id='ivs_volume_image' height="100%" >
+      </button>
+      <!------------------------>
+      <!-- Find out more Icon -->
+      <button id='ivs_find_out_more_button' onclick="event.stopPropagation();findOutMore()" >Find out more</button>
+      <!------------------------>
+    </div>
+    <!-------------------->
+
+    <!-- Poster Frame -->
+    <img id='ivs_poster_frame' src="icons/final_frame.jpeg" onclick="event.stopPropagation();openImg()">
+    <!------------------>
+
   </div>
-  
+
   <script>
+
+    // Resize videoframe upon loading
     document.onload = resize();
+    
+    // Main videoframe size in a 16:9 aspect ratio
     function resize() {
-      let width = document.querySelector(".ivs_outer").offsetWidth;
-      document.querySelector(".ivs_outer").style.height = 9 / 16 *  width + "px";
-      document.querySelector("body").style.fontSize = width / 1080 * 16 + "px";
+      let body_ele = document.querySelector("body");
+      let outer_ele = document.querySelector("#ivs_outer");
+      let min_dimension;
+      
+      if ((body_ele.offsetWidth / body_ele.offsetHeight) > (16 / 9)) {
+        outer_ele.style.width = body_ele.offsetHeight / 9 * 16 + "px";
+        outer_ele.style.height = body_ele.offsetHeight + "px";
+        min_dimension = body_ele.offsetHeight / 1080 * 16; // 16 px is the standard
+      }
+      else {
+        outer_ele.style.width = body_ele.offsetWidth + "px";
+        outer_ele.style.height = body_ele.offsetWidth / 16 * 9 + "px";
+        min_dimension = body_ele.offsetWidth / 1980 * 16;
+      }
+      
+      document.querySelector("body").style.fontSize = min_dimension + "px";
     } 
 
-    var video = document.getElementById('ivs_video');
+    const video = document.getElementById('ivs_video');
     const progress = document.getElementById("progress");
 
+    // Update progress bar value based on video timing
+    video.addEventListener("timeupdate", function() {
+      progress.value = this.currentTime / this.duration * 100;
+    });
+    
+    // Make poster frame visible once video has ended
+    video.addEventListener('ended', function() {
+      var ivs_poster_frame = document.getElementById('ivs_poster_frame');
+      ivs_poster_frame.style.visibility = 'visible';
+    });
+    
+    // Toggle volume from mute to unmute / Change volume icon
     function toggleVolume() {
-      var video = document.getElementById('ivs_video');
       if (video.muted) {
           video.muted = false;
+          document.querySelector(".ivs_volume_button > img").src = "icons/volume.svg";
       } else {
           video.muted = true;
+          document.querySelector(".ivs_volume_button > img").src = "icons/volume-mute.svg"; // make a muted version
       }
     }
 
+    function backgroundClick() {
+      alert("Background was clicked");
+      // onAdClick("target");
+    }
+
     function openImg() {
-      alert("You are redirected to another link.");
+      alert("Final frame clicked");
+      // onAdBlurbClicked("target");
     };
 
     function findOutMore() {
-      alert("Find out more.");
+      alert("Blurb was clicked");
+      // onAdBlurbClicked("target");
     };
-     
-    video.addEventListener('ended', function() {
-      var ivs_video_frame = document.getElementById('ivs_video_frame');
-      ivs_video_frame.style.display = 'none';
-      var ivs_poster_frame = document.getElementById('ivs_poster_frame');
-      ivs_poster_frame.style.display = 'block';
-    });
-
-    function progressLoop() {
-      setInterval(function () {
-        progress.value = 
-        Math.round((video.currentTime / video.duration) * 100);
-      });
-    }
-    video.addEventListener("play", progressLoop);
   </script>
 </body>
 </html>
